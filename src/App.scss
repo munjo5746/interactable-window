@@ -9,10 +9,26 @@
     height: 100vh;
     position: relative;
 
+    background: #dcdcdc;
+
+    overflow: hidden;
+
     .window {
         position: absolute;
-        top:0;
-        left:0;
+        top: 0;
+        left: 0;
 
+        background: white;
+
+        > .draggable-header {
+            width: 100%;
+            height: 30px;
+            background: #336699;
+
+            color: white;
+
+            display: flex;
+            align-items: center;
+        }
     }
 }
