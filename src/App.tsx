@@ -4,6 +4,10 @@ import './App.scss';
 const App: React.FC = () => {
     const isDragging = React.useRef<boolean>(false);
     const windowRef = React.useRef<HTMLDivElement>(null);
+    const clickedRef = React.useRef<{ clientX: number; clientY: number }>({
+        clientX: 0,
+        clientY: 0,
+    });
     React.useEffect(() => {
         const mousedown = (e: MouseEvent) => {
             // Determin if window dragging started
@@ -20,16 +24,20 @@ const App: React.FC = () => {
             const { type: possibleDraggableDivType } = target.dataset;
             if (possibleDraggableDivType !== 'draggable') return;
 
+            clickedRef.current = { clientX: e.clientX, clientY: e.clientY };
             isDragging.current = true;
         };
 
         const mousemove = (e: MouseEvent) => {
             if (!windowRef.current || !isDragging.current) return;
 
+            const xDiff = e.clientX - clickedRef.current.clientX;
+            const yDiff = e.clientY - clickedRef.current.clientY;
+
             const window = windowRef.current as HTMLDivElement;
 
-            window.style.top = `${e.clientY}px`;
-            window.style.left = `${e.clientX}px`;
+            window.style.top = `${yDiff}px`;
+            window.style.left = `${xDiff}px`;
         };
 
         const mouseup = (e: MouseEvent) => {
@@ -38,9 +46,7 @@ const App: React.FC = () => {
         };
 
         window.addEventListener('mousedown', mousedown);
-
         window.addEventListener('mousemove', mousemove);
-
         window.addEventListener('mouseup', mouseup);
 
         return () => {
