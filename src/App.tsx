@@ -30,10 +30,11 @@ const App: React.FC = () => {
 
             const { type: possibleDraggableDivType } = target.dataset;
             if (possibleDraggableDivType !== 'draggable') return;
-            const {
-                top,
-                left,
-            } = (windowRef.current as HTMLDivElement).getBoundingClientRect();
+
+            const window = windowRef.current as HTMLDivElement;
+            window.style.border = '2px solid #FE2F2E';
+
+            const { top, left } = window.getBoundingClientRect();
 
             prevPositionRef.current = {
                 clientX: e.clientX,
@@ -59,8 +60,10 @@ const App: React.FC = () => {
         };
 
         const mouseup = (e: MouseEvent) => {
+            const window = windowRef.current as HTMLDivElement;
+            window.style.border = 'none';
+
             isDragging.current = false;
-            console.log('mouse up');
         };
 
         window.addEventListener('mousedown', mousedown);
@@ -86,9 +89,7 @@ const App: React.FC = () => {
                     data-type={'draggable'}
                     data-id={`window-1-draggable`}
                     className="draggable-header"
-                >
-                    Header
-                </div>
+                ></div>
                 <div className="content">content</div>
             </div>
         </div>
