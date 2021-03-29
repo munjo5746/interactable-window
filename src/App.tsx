@@ -89,7 +89,9 @@ const App: React.FC = () => {
                     data-type={'draggable'}
                     data-id={`window-1-draggable`}
                     className="draggable-header"
-                ></div>
+                >
+                    <div className="close">x</div>
+                </div>
                 <div className="content">content</div>
             </div>
         </div>

@@ -37,6 +37,16 @@
             &:hover {
                 cursor: grab;
             }
+
+            > .close {
+                margin-left: auto;
+                margin-right: 10px;
+                font-size: 1.2rem;
+            }
+        }
+
+        > .content {
+            padding: 10px;
         }
     }
 }
