@@ -4,9 +4,16 @@ import './App.scss';
 const App: React.FC = () => {
     const isDragging = React.useRef<boolean>(false);
     const windowRef = React.useRef<HTMLDivElement>(null);
-    const clickedRef = React.useRef<{ clientX: number; clientY: number }>({
+    const prevPositionRef = React.useRef<{
+        clientX: number;
+        clientY: number;
+        top: number;
+        left: number;
+    }>({
         clientX: 0,
         clientY: 0,
+        top: 0,
+        left: 0,
     });
     React.useEffect(() => {
         const mousedown = (e: MouseEvent) => {
@@ -23,21 +30,32 @@ const App: React.FC = () => {
 
             const { type: possibleDraggableDivType } = target.dataset;
             if (possibleDraggableDivType !== 'draggable') return;
+            const {
+                top,
+                left,
+            } = (windowRef.current as HTMLDivElement).getBoundingClientRect();
 
-            clickedRef.current = { clientX: e.clientX, clientY: e.clientY };
+            prevPositionRef.current = {
+                clientX: e.clientX,
+                clientY: e.clientY,
+                top,
+                left,
+            };
             isDragging.current = true;
         };
 
         const mousemove = (e: MouseEvent) => {
             if (!windowRef.current || !isDragging.current) return;
 
-            const xDiff = e.clientX - clickedRef.current.clientX;
-            const yDiff = e.clientY - clickedRef.current.clientY;
+            const { top, left, clientX, clientY } =
+                prevPositionRef.current || {};
+            const xDiff = e.clientX - clientX;
+            const yDiff = e.clientY - clientY;
 
             const window = windowRef.current as HTMLDivElement;
 
-            window.style.top = `${yDiff}px`;
-            window.style.left = `${xDiff}px`;
+            window.style.top = `${top + yDiff}px`;
+            window.style.left = `${left + xDiff}px`;
         };
 
         const mouseup = (e: MouseEvent) => {
