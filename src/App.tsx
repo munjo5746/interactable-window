@@ -3,18 +3,13 @@ import './App.scss';
 
 const App: React.FC = () => {
     const isDragging = React.useRef<boolean>(false);
-    const windowRef = React.useRef<HTMLDivElement>(null);
     const prevPositionRef = React.useRef<{
+        div: HTMLDivElement;
         clientX: number;
         clientY: number;
         top: number;
         left: number;
-    }>({
-        clientX: 0,
-        clientY: 0,
-        top: 0,
-        left: 0,
-    });
+    }>();
     React.useEffect(() => {
         const mousedown = (e: MouseEvent) => {
             // Determin if window dragging started
@@ -31,12 +26,13 @@ const App: React.FC = () => {
             const { type: possibleDraggableDivType } = target.dataset;
             if (possibleDraggableDivType !== 'draggable') return;
 
-            const window = windowRef.current as HTMLDivElement;
+            const window = possibleWindowDiv as HTMLDivElement;
             window.style.border = '2px solid #FE2F2E';
 
             const { top, left } = window.getBoundingClientRect();
 
             prevPositionRef.current = {
+                div: window,
                 clientX: e.clientX,
                 clientY: e.clientY,
                 top,
@@ -46,21 +42,35 @@ const App: React.FC = () => {
         };
 
         const mousemove = (e: MouseEvent) => {
-            if (!windowRef.current || !isDragging.current) return;
+            if (!isDragging.current) return;
 
-            const { top, left, clientX, clientY } =
-                prevPositionRef.current || {};
+            const {
+                div,
+                top,
+                left,
+                clientX,
+                clientY,
+            } = prevPositionRef.current || {
+                div: null,
+                top: 0,
+                left: 0,
+                clientX: 0,
+                clientY: 0,
+            };
+            if (!div) return;
+
             const xDiff = e.clientX - clientX;
             const yDiff = e.clientY - clientY;
 
-            const window = windowRef.current as HTMLDivElement;
+            const window = div as HTMLDivElement;
 
             window.style.top = `${top + yDiff}px`;
             window.style.left = `${left + xDiff}px`;
         };
 
         const mouseup = (e: MouseEvent) => {
-            const window = windowRef.current as HTMLDivElement;
+            const { div } = prevPositionRef.current || { div: null };
+            const window = div as HTMLDivElement;
             window.style.border = 'none';
 
             isDragging.current = false;
@@ -79,7 +89,6 @@ const App: React.FC = () => {
     return (
         <div className="root">
             <div
-                ref={windowRef}
                 data-type={'window'}
                 data-id={'window-1'}
                 className="window"
