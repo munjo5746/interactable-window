@@ -119,7 +119,7 @@ const App: React.FC = () => {
                 return (
                     <div
                         className="window"
-                        data-type={'window'}
+                        data-type="window"
                         data-id={window.id}
                         style={{
                             width: `${window.dimension.width}px`,
