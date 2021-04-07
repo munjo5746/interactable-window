@@ -1,6 +1,13 @@
 import React from 'react';
 import './App.scss';
-
+type TWindow = {
+    id: string;
+    dimension: TDimension;
+};
+type TDimension = {
+    width: number;
+    height: number;
+};
 const App: React.FC = () => {
     const isDragging = React.useRef<boolean>(false);
     const prevPositionRef = React.useRef<{
@@ -70,6 +77,8 @@ const App: React.FC = () => {
 
         const mouseup = (e: MouseEvent) => {
             const { div } = prevPositionRef.current || { div: null };
+            if (!div) return;
+
             const window = div as HTMLDivElement;
             window.style.border = 'none';
 
@@ -86,23 +95,48 @@ const App: React.FC = () => {
             window.removeEventListener('mouseup', mouseup);
         };
     }, []);
+    const [windows, setWindows] = React.useState<TWindow[]>([]);
     return (
         <div className="root">
-            <div
-                data-type={'window'}
-                data-id={'window-1'}
-                className="window"
-                style={{ width: '500px', height: '300px' }}
+            <button
+                onClick={(e) => {
+                    e.preventDefault();
+                    setWindows((prev) => {
+                        const window: TWindow = {
+                            id: `window-${prev.length}`,
+                            dimension: {
+                                width: 500,
+                                height: 500,
+                            },
+                        };
+                        return [...prev, window];
+                    });
+                }}
             >
-                <div
-                    data-type={'draggable'}
-                    data-id={`window-1-draggable`}
-                    className="draggable-header"
-                >
-                    <div className="close">x</div>
-                </div>
-                <div className="content">content</div>
-            </div>
+                Add
+            </button>
+            {windows.map((window) => {
+                return (
+                    <div
+                        className="window"
+                        data-type={'window'}
+                        data-id={window.id}
+                        style={{
+                            width: `${window.dimension.width}px`,
+                            height: `${window.dimension.height}px`,
+                        }}
+                    >
+                        <div
+                            data-type={'draggable'}
+                            data-id={`${window.id}-draggable`}
+                            className="draggable-header"
+                        >
+                            <div className="close">x</div>
+                        </div>
+                        <div className="content">content</div>
+                    </div>
+                );
+            })}
         </div>
     );
 };
