@@ -118,6 +118,7 @@ const App: React.FC = () => {
             {windows.map((window) => {
                 return (
                     <div
+                        key={window.id}
                         className="window"
                         data-type="window"
                         data-id={window.id}
@@ -131,7 +132,24 @@ const App: React.FC = () => {
                             data-id={`${window.id}-draggable`}
                             className="draggable-header"
                         >
-                            <div className="close">x</div>
+                            {window.id}
+                            <div
+                                className="close"
+                                onClick={(e) => {
+                                    e.preventDefault();
+
+                                    setWindows((prev) => {
+                                        return [
+                                            ...prev.filter(
+                                                (prevWindow) =>
+                                                    prevWindow.id !== window.id,
+                                            ),
+                                        ];
+                                    });
+                                }}
+                            >
+                                x
+                            </div>
                         </div>
                         <div className="content">content</div>
                     </div>
