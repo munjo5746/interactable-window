@@ -24,6 +24,8 @@ const App: React.FC = () => {
             return true;
         }
     }, []);
+
+    const [showSidebarArea, toggleSidebarArea] = React.useState<boolean>(false);
     React.useEffect(() => {
         const mousedown = (e: MouseEvent) => {
             // Determin if window dragging started
@@ -53,6 +55,8 @@ const App: React.FC = () => {
                 left,
             };
             isDragging.current = true;
+
+            toggleSidebarArea(true);
         };
 
         const mousemove = (e: MouseEvent) => {
@@ -108,6 +112,7 @@ const App: React.FC = () => {
             window.style.border = 'none';
 
             isDragging.current = false;
+            toggleSidebarArea(false);
         };
 
         window.addEventListener('mousedown', mousedown);
@@ -166,10 +171,9 @@ const App: React.FC = () => {
                     );
                 })}
 
-                <div className="expanding-area top-left"></div>
-                <div className="expanding-area top-right"></div>
-                <div className="expanding-area bottom-right"></div>
-                <div className="expanding-area bottom-left"></div>
+                {showSidebarArea && (
+                    <div className="side-bar-expanding-area">Drag here</div>
+                )}
             </div>
 
             <button
