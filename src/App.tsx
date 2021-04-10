@@ -17,6 +17,12 @@ const App: React.FC = () => {
         top: number;
         left: number;
     }>();
+    const inExpadingArea = React.useCallback((e: MouseEvent) => {
+        const { clientX, clientY } = e;
+        if (clientX < 50 && clientY < 50) {
+            return true;
+        }
+    }, []);
     React.useEffect(() => {
         const mousedown = (e: MouseEvent) => {
             // Determin if window dragging started
@@ -71,6 +77,15 @@ const App: React.FC = () => {
 
             const window = div as HTMLDivElement;
 
+            if (inExpadingArea(e)) {
+                window.style.top = `${0}px`;
+                window.style.left = `${0}px`;
+                window.style.width = '1000px';
+                window.style.height = '1000px';
+
+                return;
+            }
+
             window.style.top = `${top + yDiff}px`;
             window.style.left = `${left + xDiff}px`;
         };
@@ -97,8 +112,62 @@ const App: React.FC = () => {
     }, []);
     const [windows, setWindows] = React.useState<TWindow[]>([]);
     return (
-        <div className="root">
+        <>
+            <div className="root">
+                {windows.map((window) => {
+                    return (
+                        <div
+                            key={window.id}
+                            className="window"
+                            data-type="window"
+                            data-id={window.id}
+                            style={{
+                                width: `${window.dimension.width}px`,
+                                height: `${window.dimension.height}px`,
+                            }}
+                        >
+                            <div
+                                data-type={'draggable'}
+                                data-id={`${window.id}-draggable`}
+                                className="draggable-header"
+                            >
+                                {window.id}
+                                <div
+                                    className="close"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+
+                                        setWindows((prev) => {
+                                            return [
+                                                ...prev.filter(
+                                                    (prevWindow) =>
+                                                        prevWindow.id !==
+                                                        window.id,
+                                                ),
+                                            ];
+                                        });
+                                    }}
+                                >
+                                    x
+                                </div>
+                            </div>
+                            <div className="content">content</div>
+                        </div>
+                    );
+                })}
+
+                <div className="expanding-area top-left"></div>
+                <div className="expanding-area top-right"></div>
+                <div className="expanding-area bottom-right"></div>
+                <div className="expanding-area bottom-left"></div>
+            </div>
+
             <button
+                style={{
+                    width: '5em',
+                    height: '3em',
+                    margin: '1em 0',
+                }}
                 onClick={(e) => {
                     e.preventDefault();
                     setWindows((prev) => {
@@ -115,47 +184,7 @@ const App: React.FC = () => {
             >
                 Add
             </button>
-            {windows.map((window) => {
-                return (
-                    <div
-                        key={window.id}
-                        className="window"
-                        data-type="window"
-                        data-id={window.id}
-                        style={{
-                            width: `${window.dimension.width}px`,
-                            height: `${window.dimension.height}px`,
-                        }}
-                    >
-                        <div
-                            data-type={'draggable'}
-                            data-id={`${window.id}-draggable`}
-                            className="draggable-header"
-                        >
-                            {window.id}
-                            <div
-                                className="close"
-                                onClick={(e) => {
-                                    e.preventDefault();
-
-                                    setWindows((prev) => {
-                                        return [
-                                            ...prev.filter(
-                                                (prevWindow) =>
-                                                    prevWindow.id !== window.id,
-                                            ),
-                                        ];
-                                    });
-                                }}
-                            >
-                                x
-                            </div>
-                        </div>
-                        <div className="content">content</div>
-                    </div>
-                );
-            })}
-        </div>
+        </>
     );
 };
 
