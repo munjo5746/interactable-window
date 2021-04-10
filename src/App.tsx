@@ -9,6 +9,7 @@ type TDimension = {
     height: number;
 };
 const App: React.FC = () => {
+    const rootRef = React.useRef<HTMLDivElement>(null);
     const isDragging = React.useRef<boolean>(false);
     const prevPositionRef = React.useRef<{
         div: HTMLDivElement;
@@ -78,16 +79,25 @@ const App: React.FC = () => {
             const window = div as HTMLDivElement;
 
             if (inExpadingArea(e)) {
+                const {
+                    width,
+                    height,
+                } = rootRef.current?.getBoundingClientRect() || {
+                    width: window.style.width,
+                    height: window.style.height,
+                };
                 window.style.top = `${0}px`;
                 window.style.left = `${0}px`;
-                window.style.width = '1000px';
-                window.style.height = '1000px';
+                window.style.width = `${width}px`;
+                window.style.height = `${height}px`;
 
                 return;
             }
 
             window.style.top = `${top + yDiff}px`;
             window.style.left = `${left + xDiff}px`;
+            window.style.width = '500px';
+            window.style.height = '500px';
         };
 
         const mouseup = (e: MouseEvent) => {
@@ -113,7 +123,7 @@ const App: React.FC = () => {
     const [windows, setWindows] = React.useState<TWindow[]>([]);
     return (
         <>
-            <div className="root">
+            <div ref={rootRef} className="root">
                 {windows.map((window) => {
                     return (
                         <div
