@@ -28,9 +28,9 @@
         > .draggable-header {
             width: 100%;
             height: 30px;
-            background: #336699;
+            background: #e4e6eb;
 
-            color: white;
+            color: black;
 
             user-select: none;
 
@@ -55,7 +55,6 @@
 
     > .side-bar-expanding-area {
         position: absolute;
-        width: 300px;
         height: 100%;
 
         box-sizing: border-box;

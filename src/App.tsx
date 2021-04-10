@@ -9,6 +9,7 @@ type TDimension = {
     height: number;
 };
 const App: React.FC = () => {
+    const EXPANDING_AREA_WIDTH = 300;
     const rootRef = React.useRef<HTMLDivElement>(null);
     const isDragging = React.useRef<boolean>(false);
     const prevPositionRef = React.useRef<{
@@ -20,7 +21,7 @@ const App: React.FC = () => {
     }>();
     const inExpadingArea = React.useCallback((e: MouseEvent) => {
         const { clientX, clientY } = e;
-        if (clientX < 50 && clientY < 50) {
+        if (clientX < EXPANDING_AREA_WIDTH) {
             return true;
         }
     }, []);
@@ -43,7 +44,7 @@ const App: React.FC = () => {
             if (possibleDraggableDivType !== 'draggable') return;
 
             const window = possibleWindowDiv as HTMLDivElement;
-            window.style.border = '2px solid #FE2F2E';
+            window.style.border = '2px solid gray';
 
             const { top, left } = window.getBoundingClientRect();
 
@@ -83,16 +84,13 @@ const App: React.FC = () => {
             const window = div as HTMLDivElement;
 
             if (inExpadingArea(e)) {
-                const {
-                    width,
-                    height,
-                } = rootRef.current?.getBoundingClientRect() || {
+                const { height } = rootRef.current?.getBoundingClientRect() || {
                     width: window.style.width,
                     height: window.style.height,
                 };
                 window.style.top = `${0}px`;
                 window.style.left = `${0}px`;
-                window.style.width = `${width}px`;
+                window.style.width = `${EXPANDING_AREA_WIDTH}px`;
                 window.style.height = `${height}px`;
 
                 return;
@@ -172,7 +170,14 @@ const App: React.FC = () => {
                 })}
 
                 {showSidebarArea && (
-                    <div className="side-bar-expanding-area">Drag here</div>
+                    <div
+                        className="side-bar-expanding-area"
+                        style={{
+                            width: EXPANDING_AREA_WIDTH,
+                        }}
+                    >
+                        Drag here
+                    </div>
                 )}
             </div>
 
