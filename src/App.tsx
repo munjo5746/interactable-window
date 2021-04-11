@@ -1,4 +1,7 @@
+import { Socket } from 'dgram';
 import React from 'react';
+import { io } from 'socket.io-client';
+import { DefaultEventsMap } from 'socket.io-client/build/typed-events';
 import './App.scss';
 type TWindow = {
     id: string;
@@ -20,7 +23,7 @@ const App: React.FC = () => {
         left: number;
     }>();
     const inExpadingArea = React.useCallback((e: MouseEvent) => {
-        const { clientX, clientY } = e;
+        const { clientX } = e;
         if (clientX < EXPANDING_AREA_WIDTH) {
             return true;
         }
@@ -123,7 +126,37 @@ const App: React.FC = () => {
             window.removeEventListener('mouseup', mouseup);
         };
     }, []);
+
     const [windows, setWindows] = React.useState<TWindow[]>([]);
+    const socket = React.useMemo(() => io('http://localhost:8080'), []);
+    React.useEffect(() => {
+        if (!socket) return;
+
+        socket.on('connect', () => {
+            console.log('connected socket id:', socket.id);
+        });
+        socket.on('new-window', (arg) => {
+            console.log('received', arg);
+            const { senderId } = arg;
+
+            if (senderId === socket.id) {
+                console.log('This client was sender... skipping the process!');
+                return;
+            }
+
+            console.log('validating and adding...');
+
+            setWindows((prev) => {
+                const { window } = arg;
+                const found = prev.some((win) => win.id === window.id);
+                if (found) {
+                    console.log(`The window (${window.id}) was found.`);
+                    return [...prev];
+                }
+                return [...prev, window];
+            });
+        });
+    }, [socket]);
     return (
         <>
             <div ref={rootRef} className="root">
@@ -189,16 +222,16 @@ const App: React.FC = () => {
                 }}
                 onClick={(e) => {
                     e.preventDefault();
-                    setWindows((prev) => {
-                        const window: TWindow = {
-                            id: `window-${prev.length}`,
-                            dimension: {
-                                width: 500,
-                                height: 500,
-                            },
-                        };
-                        return [...prev, window];
-                    });
+                    const window: TWindow = {
+                        id: `window-${windows.length}`,
+                        dimension: {
+                            width: 500,
+                            height: 500,
+                        },
+                    };
+                    socket.emit('new-window', window);
+
+                    setWindows([...windows, window]);
                 }}
             >
                 Add
