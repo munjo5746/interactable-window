@@ -15,6 +15,15 @@ io.on('connection', (socket) => {
         };
         io.sockets.emit('new-window', sendingArg);
     });
+
+    socket.on('move', (args) => {
+        const sendingArgs = {
+            senderId: socket.id,
+            ...args
+        };
+
+        io.sockets.emit('move', sendingArgs);
+    });
 });
 
 httpServer.listen(8080);
